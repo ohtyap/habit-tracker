@@ -26,7 +26,7 @@ def run(database_file: str):
 
     try:
         # Forward the remaining argv arguments, the database and the runtime config to the command
-        command.execute(sys.argv[2:], database, config)
+        command(sys.argv[2:], database, config).execute()
     except KeyboardInterrupt:
         # In case the user interrupts the input (ctrl + c)
         pass

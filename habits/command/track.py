@@ -1,11 +1,9 @@
 import sys
-from habits.database.habit_repository import HabitRepository
-from habits.database.tracking_repository import TrackingRepository
 from habits.console_definition import ConsoleDefinition
-from datetime import datetime
+from habits.command.command import Command
 
 
-class Track:
+class Track(Command):
     @staticmethod
     def definition(config: dict) -> ConsoleDefinition:
         return ConsoleDefinition(
@@ -15,24 +13,18 @@ class Track:
             {}
         )
 
-    @staticmethod
-    def execute(args, database, config):
-        habit_repository = HabitRepository(database, config)
+    def execute(self):
+        self.display_habit_list()
+        sys.stdout.write('\nHabit: ')
 
-        output = '#{} {}\n'
-        for habit in habit_repository.fetch_all():
-            sys.stdout.write(output.format(habit.id, habit.title))
-
-        sys.stdout.write('Habit: ')
         requested_habit_id = int(input())
-        sys.stdout.write('\n')
-        habit = habit_repository.fetch_by_id(requested_habit_id)
+        sys.stdout.write('\n\n')
 
-        tracking_repository = TrackingRepository(database, config)
-        tracking_repository.create({
-            'habit_id': habit.id,
-            'created_at': datetime.now(),
-        })
+        try:
+            habit = self.habit_repository.fetch_by_id(requested_habit_id)
+            self.tracking_repository.create_new_tracking_entry(habit.id)
+        except RuntimeError:
+            sys.stdout.write('Invalid habit selection')
 
 
 

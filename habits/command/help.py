@@ -1,8 +1,9 @@
 import sys
 from habits.console_definition import ConsoleDefinition
+from habits.command.command import Command
 
 
-class Help:
+class Help(Command):
     @staticmethod
     def definition(config: dict) -> ConsoleDefinition:
         command_list = config.get('commands')
@@ -34,18 +35,17 @@ class Help:
             sys.stdout.write(output.format(item, " " * (15 - len(item)), console_definition.parameters.get(item)))
         sys.stdout.write('\n')
 
-    @staticmethod
-    def execute(args, database, config):
-        commands = config.get('commands')
+    def execute(self):
+        commands = self.config.get('commands')
 
-        if len(args) == 0:
-            Help.display_help(Help.definition(config))
+        if len(self.args) == 0:
+            Help.display_help(Help.definition(self.config))
             return
 
-        if args[0] not in commands:
-            sys.stdout.write('Command {} does not exist.\n'.format(args[0]))
-            Help.display_help(Help.definition(config))
+        if self.args[0] not in commands:
+            sys.stdout.write('Command {} does not exist.\n'.format(self.args[0]))
+            Help.display_help(Help.definition(self.config))
             return
 
-        command = commands.get(args[0])
-        Help.display_help(command.definition(config))
+        command = commands.get(self.args[0])
+        Help.display_help(command.definition(self.config))

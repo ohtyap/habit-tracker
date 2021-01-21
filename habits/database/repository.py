@@ -71,3 +71,7 @@ class Repository:
         return self.fetch_by_id(
             self._database.insert(sql, list(attr.values()))
         )
+
+    # Clears the internal entity cache
+    def clear(self):
+        self._cache = []

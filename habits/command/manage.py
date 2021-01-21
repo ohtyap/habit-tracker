@@ -1,11 +1,11 @@
 import sys
-from habits.database.habit_repository import HabitRepository
 from habits.console_definition import ConsoleDefinition
-from habits.command.help import Help
 from datetime import datetime
+from habits.command.command import Command
 
 
-class Manage:
+class Manage(Command):
+
     @staticmethod
     def definition(config: dict) -> ConsoleDefinition:
         return ConsoleDefinition(
@@ -19,34 +19,27 @@ class Manage:
             }
         )
 
-    @staticmethod
-    def execute(args, database, config):
-        repository = HabitRepository(database, config)
-
-        if len(args) == 0 or args[0] == 'list':
-            Manage.list_habits(repository)
+    def execute(self):
+        if self.args[0] == 'list':
+            self.list_habits()
             return
 
-        if args[0] == 'create':
-            Manage.create_habit(repository, config)
+        if self.args[0] == 'create':
+            self.create_habit()
             return
 
-        if args[0] == 'delete':
-            Manage.delete_habit(repository)
+        if self.args[0] == 'delete':
+            self.delete_habit()
             return
 
         sys.stdout.write("Invalid command parameters\n")
 
-        Help.display_help(Manage.definition(config))
+        self.config.get('commands').get('help').display_help(Manage.definition(self.config))
 
-    @staticmethod
-    def list_habits(repository: HabitRepository):
-        output = '#{} - {} ({} habit)\n'
-        for habit in repository.fetch_all():
-            sys.stdout.write(output.format(habit.id, habit.title, habit.period))
+    def list_habits(self):
+        self.display_habit_list()
 
-    @staticmethod
-    def create_habit(repository: HabitRepository, config):
+    def create_habit(self):
         sys.stdout.write('Title: ')
         title = str(input()).strip()
         sys.stdout.write('\n')
@@ -55,7 +48,7 @@ class Manage:
             return
 
         output = '{}) {}\n'
-        periods = list(config.get('periods').keys())
+        periods = list(self.config.get('periods').keys())
         for i, name in enumerate(periods, start=1):
             sys.stdout.write(output.format(i, name))
 
@@ -65,22 +58,15 @@ class Manage:
             sys.stdout.write("Selected period does not exist.\n")
             return
 
-        habit = repository.create({
-            'title': title,
-            'period': periods[period_selection],
-            'created_at': datetime.now(),
-        })
+        habit = self.habit_repository.create_new_habit(title, periods[period_selection])
         sys.stdout.write('Habit {} with id {} successfully saved.\n'.format(habit.title, habit.id))
 
-    @staticmethod
-    def delete_habit(repository: HabitRepository):
-        output = '#{} {}\n'
-        for habit in repository.fetch_all():
-            sys.stdout.write(output.format(habit.id, habit.title))
-
+    def delete_habit(self):
+        self.display_habit_list()
         sys.stdout.write('Habit: ')
         requested_habit_id = int(input())
         sys.stdout.write('\n')
-        habit = repository.fetch_by_id(requested_habit_id)
-        repository.remove(habit.id)
+        habit = self.habit_repository.fetch_by_id(requested_habit_id)
+        self.habit_repository.remove(habit.id)
+        self.tracking_repository.delete_by_habit_id(habit.id)
         sys.stdout.write('Habit #{} {} deleted.\n'.format(habit.id, habit.title))
