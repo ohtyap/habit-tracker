@@ -31,9 +31,9 @@ class Repository:
         if result is None:
             raise RuntimeError
 
-        self._cache[id] = self.entity(**dict(result))
+        self._cache[rowid] = self.entity(**dict(result))
 
-        return self._cache[id]
+        return self._cache[rowid]
 
     # Fetches all data for this repository and return a list of entities
     def fetch_all(self) -> list:
