@@ -1,6 +1,7 @@
 class Repository:
     _table = ''
     _entity = ''
+    _cache = {}
 
     def __init__(self, database, config):
         if self.entity not in config.get('entities'):
@@ -17,11 +18,17 @@ class Repository:
         return self._entity
 
     def fetch_by_id(self, rowid: int):
+        if int in self._cache:
+            return self._cache[id]
+
         result = self._database.load_one(
             'SELECT rowid as id, * FROM ' + self.table + ' WHERE rowid=? LIMIT 1',
             [rowid]
         )
-        return self.entity(**dict(result))
+
+        self._cache[id] = self.entity(**dict(result))
+
+        return self._cache[id]
 
     def fetch_all(self) -> list:
         result = self._database.load_all(
@@ -31,7 +38,10 @@ class Repository:
 
         rows = []
         for item in result:
-            rows.append(self.entity(**dict(item)))
+            entity = self.entity(**dict(item))
+            self._cache[entity.id] = entity
+
+            rows.append(entity)
 
         return rows
 
@@ -40,6 +50,8 @@ class Repository:
             'DELETE FROM ' + self.table + ' WHERE rowid=?',
             [rowid]
         )
+
+        del self._cache[rowid]
 
     def create(self, attr: dict):
         sql = 'INSERT INTO {} ({}) VALUES ({})'.format(
