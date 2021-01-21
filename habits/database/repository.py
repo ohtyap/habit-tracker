@@ -5,7 +5,8 @@ class Repository:
 
     def __init__(self, database, config):
         if self.entity not in config.get('entities'):
-            print("TODO Exception")
+            raise RuntimeError
+
         self._database = database
         self._config = config
 
@@ -19,13 +20,16 @@ class Repository:
 
     # Fetch one entity by a given id. If already once requested it does not send another SQL to the database
     def fetch_by_id(self, rowid: int):
-        if int in self._cache:
-            return self._cache[id]
+        if rowid in self._cache.keys():
+            return self._cache[rowid]
 
         result = self._database.load_one(
             'SELECT rowid as id, * FROM ' + self.table + ' WHERE rowid=? LIMIT 1',
             [rowid]
         )
+
+        if result is None:
+            raise RuntimeError
 
         self._cache[id] = self.entity(**dict(result))
 
@@ -53,8 +57,8 @@ class Repository:
             'DELETE FROM ' + self.table + ' WHERE rowid=?',
             [rowid]
         )
-
-        del self._cache[rowid]
+        if rowid in self._cache.keys():
+            del self._cache[rowid]
 
     # Creates a entity by a dictionary, saves it to the database and returns the corresponding entity
     def create(self, attr: dict):
