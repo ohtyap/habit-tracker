@@ -45,4 +45,7 @@ class Database:
             return
         sql_file = os.path.abspath(os.path.dirname(__file__) + '/../../setup') + '/setup.sql'
         cursor = self._connection.cursor()
-        cursor.executescript(open(sql_file).read())
+        file_res = open(sql_file)
+        cursor.executescript(file_res.read())
+        file_res.close()
+
