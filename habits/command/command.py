@@ -42,7 +42,19 @@ class Command:
 
         return self._tracking_repository
 
+    # Display a generic list of habits
     def display_habit_list(self, period: str = None):
-        output = '#{} {}\n'
+        output = '{}{}{}{}{}\n'
         for habit in self.habit_repository.fetch_all():
-            sys.stdout.write(output.format(habit.id, habit.title))
+            if period is not None and habit.period != period:
+                continue
+
+            sys.stdout.write(
+                output.format(
+                    habit.id,
+                    " " * (4 - len(str(habit.id))),
+                    habit.period,
+                    " " * (10 - len(str(habit.period))),
+                    habit.title
+                )
+            )

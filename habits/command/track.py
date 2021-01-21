@@ -7,7 +7,7 @@ class Track(Command):
     @staticmethod
     def definition(config: dict) -> ConsoleDefinition:
         return ConsoleDefinition(
-            'Checkoff a habit.',
+            'Checkoff a task for a given habit.',
             'track',
             '',
             {}

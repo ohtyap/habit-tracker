@@ -12,7 +12,7 @@ class Analyze(Command):
         return ConsoleDefinition(
             'Analyze your habits.',
             'analyze',
-            'Available parameters:',
+            '',
             {}
         )
 
@@ -33,26 +33,27 @@ class Analyze(Command):
 
         self._output_result(analyzed_stream)
 
+    # Display the habit selection and read users input/selection
     def _request_user_input(self) -> int:
-        output = '#{} {}\n'
-        sys.stdout.write(output.format(0, 'All habits'))
         self.display_habit_list()
-        sys.stdout.write('Habit: ')
+        sys.stdout.write('Select a habit by id (or 0 for aggregation): ')
         selected_habit_id = int(input())
         sys.stdout.write('\n\n')
 
         return selected_habit_id
 
+    # Format and display the result
     def _output_result(self, info: dict):
         if 'number_of_breaks' not in info.keys():
             sys.stdout.write('Not enough data to provide analyzing')
             return
 
-        sys.stdout.write("Longest streak: {} - {}\n".format(info['highest_streak'][2], info['highest_streak'][3]))
-        sys.stdout.write("Number of streaks: {}\n".format(info['number_of_breaks']))
-        sys.stdout.write("Number of breaks: {}\n".format(info['number_of_streaks']))
-        sys.stdout.write("Success rate: {}%\n".format(round(info['sum_streak_units'] / info['sum_complete_units'] * 100)))
+        sys.stdout.write("Longest streak:     {} - {}\n".format(info['highest_streak'][2], info['highest_streak'][3]))
+        sys.stdout.write("Number of streaks:  {}\n".format(info['number_of_breaks']))
+        sys.stdout.write("Number of breaks:   {}\n".format(info['number_of_streaks']))
+        sys.stdout.write("Success rate:       {}%\n".format(round(info['sum_streak_units'] / info['sum_complete_units'] * 100)))
 
+    # Retrieve a single or all habits from the database
     def _raw_habits(self, selected_habit_id: int) -> iter:
         if selected_habit_id == 0:
             sql = 'SELECT rowid as id, * FROM habits'
@@ -63,6 +64,7 @@ class Analyze(Command):
 
         return self.database.load_all(sql, params)
 
+    # Retrieves all tracking entries from the database
     def _raw_tracking(self) -> iter:
         for item in self.database.load_all('SELECT * FROM tracking', []):
             yield dict(item)

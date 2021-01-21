@@ -1,6 +1,5 @@
 import sys
 from habits.console_definition import ConsoleDefinition
-from datetime import datetime
 from habits.command.command import Command
 
 
@@ -10,34 +9,46 @@ class Manage(Command):
     def definition(config: dict) -> ConsoleDefinition:
         return ConsoleDefinition(
             'List, create and delete habits.',
-            'manage (delete|create|list)',
+            'manage (delete|create|list) [--period xyz]',
             'Available parameters:',
             {
                 'create': 'Starts wizard for creating a habit.',
                 'delete': 'Starts wizard for deleting a habit.',
                 'list': 'List all current habits.',
+                '--period': 'Limit the output to a selected period. Only works in combination with list.'
             }
         )
 
     def execute(self):
-        if self.args[0] == 'list':
+        command = ''
+        if len(self.args) > 0:
+            command = self.args[0]
+
+        if command == 'list':
             self.list_habits()
             return
 
-        if self.args[0] == 'create':
+        if command == 'create':
             self.create_habit()
             return
 
-        if self.args[0] == 'delete':
+        if command == 'delete':
             self.delete_habit()
             return
 
         sys.stdout.write("Invalid command parameters\n")
-
         self.config.get('commands').get('help').display_help(Manage.definition(self.config))
 
     def list_habits(self):
-        self.display_habit_list()
+        period = None
+        if len(self.args) == 3 and self.args[1] == '--period':
+            period = self.args[2]
+
+        if period not in self.config.get('periods'):
+            sys.stdout.write("Invalid period\n")
+            return
+
+        self.display_habit_list(period)
 
     def create_habit(self):
         sys.stdout.write('Title: ')
