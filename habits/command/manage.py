@@ -44,7 +44,7 @@ class Manage(Command):
         if len(self.args) == 3 and self.args[1] == '--period':
             period = self.args[2]
 
-        if period not in self.config.get('periods'):
+        if period is not None and period not in self.config.get('periods'):
             sys.stdout.write("Invalid period\n")
             return
 
