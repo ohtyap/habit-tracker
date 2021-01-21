@@ -4,7 +4,7 @@ import os
 
 class Database:
     def __init__(self, database_file):
-        self._connection = sqlite3.connect(database_file)
+        self._connection = sqlite3.connect(database_file, detect_types=sqlite3.PARSE_DECLTYPES|sqlite3.PARSE_COLNAMES)
         self._connection.row_factory = sqlite3.Row
         self.migration()
 

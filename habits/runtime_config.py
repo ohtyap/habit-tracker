@@ -4,6 +4,8 @@ from habits.command.track import Track
 from habits.command.analyze import Analyze
 from habits.database.habit import Habit
 from habits.database.tracking import Tracking
+from habits.analyze.daily import create_stream as daily_create_stream
+from habits.analyze.weekly import create_stream as weekly_create_stream
 
 config = {
     'commands': {
@@ -17,7 +19,7 @@ config = {
         Tracking
     ],
     'periods': {
-        'daily': '',
-        'weekly': '',
+        'daily': daily_create_stream,
+        'weekly': weekly_create_stream,
     }
 }
