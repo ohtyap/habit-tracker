@@ -1,7 +1,14 @@
 class ConsoleDefinition:
+    # Description of the command. Used for the help overview
     _description: str
+
+    # Usage line for help
     _usage: str
+
+    # In case of parameters, a meaningful title for the help command
     _parameter_title: str
+
+    # Available parameters as dictionary
     _parameters: dict
 
     def __init__(self, description: str, usage: str, parameter_title: str, parameters: dict):

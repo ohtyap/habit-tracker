@@ -3,6 +3,7 @@ from datetime import timedelta
 from math import ceil
 
 
+# creates a unified tracking stream [('date', <bool>)] on a weekly base.
 def create_stream(start: datetime, tracking: iter):
     end = datetime.now() - timedelta(days=7)
 
@@ -14,5 +15,6 @@ def create_stream(start: datetime, tracking: iter):
     return [(k, v) for k, v in date_range.items()]
 
 
+# creates a initial range of weeks
 def create_date_range(start: datetime, end: datetime) -> dict:
     return dict([((start + timedelta(days=x*7)).strftime('%Y-KW%W'), False) for x in range(0, ceil((end - start).days/7))])

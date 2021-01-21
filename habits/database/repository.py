@@ -17,6 +17,7 @@ class Repository:
     def entity(self) -> str:
         return self._entity
 
+    # Fetch one entity by a given id. If already once requested it does not send another SQL to the database
     def fetch_by_id(self, rowid: int):
         if int in self._cache:
             return self._cache[id]
@@ -30,6 +31,7 @@ class Repository:
 
         return self._cache[id]
 
+    # Fetches all data for this repository and return a list of entities
     def fetch_all(self) -> list:
         result = self._database.load_all(
             'SELECT rowid as id, * FROM ' + self.table,
@@ -45,6 +47,7 @@ class Repository:
 
         return rows
 
+    # Removes one row from the database by a given id
     def remove(self, rowid: int):
         self._database.delete(
             'DELETE FROM ' + self.table + ' WHERE rowid=?',
@@ -53,6 +56,7 @@ class Repository:
 
         del self._cache[rowid]
 
+    # Creates a entity by a dictionary, saves it to the database and returns the corresponding entity
     def create(self, attr: dict):
         sql = 'INSERT INTO {} ({}) VALUES ({})'.format(
             self.table,
