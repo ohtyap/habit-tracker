@@ -10,6 +10,9 @@ from itertools import groupby
 # number_of_breaks: The number of breaks
 def analyze_stream(stream: list) -> dict:
     stream = list(stream)
+    if len(stream) == 0:
+        return {}
+    
     streaks = list(filter_streaks(stream))
 
     number_of_streaks = len(streaks)
