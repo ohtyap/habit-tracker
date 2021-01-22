@@ -78,16 +78,70 @@ user friendly string. The boolean value indicates if the user checked off the ha
 
 This function must be registered in `runtime_config.py`. 
 ```python
-config = {
 from habits.analyze.daily import create_stream as daily_create_stream
 from habits.analyze.weekly import create_stream as weekly_create_stream
 from habits.analyze.monthly import create_stream as monthly_create_stream
+
+
+config = {
     #...
     "periods": {
         'daily': daily_create_stream,
         'weekly': weekly_create_stream,
         'monthly': monthly_create_stream,
     }
+}
+```
+
+## Add your own console command
+To add your own console command, you need to create a class which inherits from `Commmand` and 
+is implementing two methods. As example a boilerplate code:
+
+```python
+from habits.console_definition import ConsoleDefinition
+from habits.command.command import Command
+
+
+class YourCommand(Command):
+    @staticmethod
+    def definition(config: dict) -> ConsoleDefinition:
+        return ConsoleDefinition(
+            'A little description',
+            'Usage',
+            'title of your parameters',
+            {
+                '--try': 'Explanation of --try'
+            }
+        )
+
+    def execute(self):
+        # Access to args
+        self.args
+        # Access to the database
+        self.database
+        # Access to the runtime config
+        self.config
+        # Access to the HabitRepository
+        self.habit_repository
+        # Access to the TrackingRepository
+        self.tracking_repository
+```
+
+Like periods a command is register inside the `runtime_config`:
+```python
+from habits.command.help import Help
+from habits.command.manage import Manage
+from habits.command.track import Track
+from habits.command.analyze import Analyze
+from habits.command.your_command import YourCommand
+config ={ 
+    'commands': {
+        'help': Help,
+        'manage': Manage,
+        'track': Track,
+        'analyze': Analyze,
+        'yourcommand': YourCommand
+    },
 }
 ```
 
