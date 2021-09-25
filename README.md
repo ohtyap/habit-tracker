@@ -4,7 +4,7 @@ well you are sticking with your daily or weekly habits.
 
 ## Installation
 ```commandline
-$ git clone git@github.com:ohtyap/habit-tracker.git
+$ git clone https://github.com/ohtyap/habit-tracker
 $ cd habit-tracker
 $ python -m habits
 ```
