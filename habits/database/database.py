@@ -1,5 +1,7 @@
-import sqlite3
+import importlib.resources
 import os
+import sqlite3
+from pathlib import Path
 
 
 class Database:
@@ -43,9 +45,7 @@ class Database:
         result = self.load_one('SELECT name FROM sqlite_master WHERE type=? AND name=?', ['table', 'habits'])
         if result is not None:
             return
-        sql_file = os.path.abspath(os.path.dirname(__file__) + '/../../setup') + '/setup.sql'
         cursor = self._connection.cursor()
-        file_res = open(sql_file)
-        cursor.executescript(file_res.read())
-        file_res.close()
-
+        cursor.executescript(
+            importlib.resources.read_text("habits.database", "setup.sql")
+        )

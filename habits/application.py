@@ -1,9 +1,12 @@
 import sys
+from pathlib import Path
+
 from habits.runtime_config import config
 from habits.database.database import Database
 
 
-def run(database_file: str):
+def run(database_file: Path):
+    database_file.parent.mkdir(parents=True, exist_ok=True)
 
     # Initializing the sqlite database wrapper
     database = Database(database_file)
@@ -16,13 +19,13 @@ def run(database_file: str):
     if len(command_name_arr) != 0:
         command_name = command_name_arr[0]
 
-    commands = config.get('commands')
+    commands = config.get("commands")
 
     command = commands.get(command_name)
     # When selected command does not exist in the runtime_config, fallback to `help`
     if command is None:
-        sys.stdout.write('Command not found. See help for more information\n')
-        command = commands.get('help')
+        sys.stdout.write("Command not found. See help for more information\n")
+        command = commands.get("help")
 
     try:
         # Forward the remaining argv arguments, the database and the runtime config to the command
