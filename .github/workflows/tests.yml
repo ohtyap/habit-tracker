@@ -23,5 +23,5 @@ jobs:
       - uses: actions/setup-python@v2
         with:
           python-version: ${{ matrix.python-version }}
-      - name: run pytest
-        run: python -m pytest
+      - name: run tests
+        run: python -m unittest discover -s tests
